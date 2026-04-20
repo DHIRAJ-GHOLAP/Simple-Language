@@ -38,9 +38,9 @@ def say_value_of_variable(line, variables):
             print(f"The variable {variable_name} is not defined.")
 # this is main function
 def main():
-    os.system("cls")
+    # Use 'clear' for Linux/Unix and 'cls' for Windows
+    os.system("clear" if os.name != "nt" else "cls")
    
-
     Variable_Dictionary = {}
     Line_Number = 0
 
@@ -48,53 +48,42 @@ def main():
 #                          File reading section Section                          # 
 ##################################################################################
 
+    if not os.path.exists("Demo.simple"):
+        print("Error: Demo.simple not found.")
+        return
+
     with open("Demo.simple", "r") as file:
         code_lines = file.readlines()
-    for user in code_lines:
-        
-        Line_Number += 1
-        user = user.strip().lower()
 
-        if user == "system fad denge":
+    for line in code_lines:
+        Line_Number += 1
+        line = line.strip().lower()
+
+        if not line or line.startswith("#"):
+            continue
+
+        if line == "system fad denge":
             break
 
-        if "say" in user:
-            print(user[4:], "\n")
+        if "say" in line:
+            tools.Print_function(line)
+            continue
 
-        if "cls" in user[0:4]:
-            Line_Number = 0
-            os.system("cls")
-           
+        if "cls" in line or "clear" in line:
+            tools.Clear_function(line)
+            continue
 
-        variable_assign(user, Variable_Dictionary)
-        say_value_of_variable(user, Variable_Dictionary)
-##################################################################################
-#                       number input function Section                            # 
-##################################################################################
+        if "variable name is" in line:
+            variable_assign(line, Variable_Dictionary)
+            continue
 
+        if "tell value of" in line:
+            say_value_of_variable(line, Variable_Dictionary)
+            continue
 
-
-##################################################################################
-#                                 OPRATOR Section                                # 
-##################################################################################
-    if user[0].isdigit:
-            
-            # operands = user.split("+")
-            # result = 0
-
-            # for operand in operands:
-            #     operand = operand.strip()
-            #     if operand.isdigit():
-            #         result += int(operand)
-            #     elif operand in Variable_Dictionary:
-            #         result += Variable_Dictionary[operand]
-            #     else:
-            #         print(f"Invalid operand: {operand} is not a valid number or variable.")
-            #         break
-            # else:
-            #     print(f" >>>  {result}")
-            tools.oprator_function(user)
-
+        # If it doesn't match the above, try arithmetic
+        if any(op in line for op in ["+", "-", "*", "/"]):
+            tools.oprator_function(line, Variable_Dictionary)
 
 if __name__ == "__main__":
     main()
